@@ -4,6 +4,11 @@
 
 Visit the Planes Web Game at https://bavovanderghote.be/planes/.
 
+### Goal
+
+- Take out the AI
+- Don't crash
+
 ### Controls
 
 #### Keyboard
