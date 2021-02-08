@@ -1,0 +1,13 @@
+{
+  "name": "threejs_planes-parcel",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "parcel src/index.html --host 127.0.0.1",
+    "build": "parcel build src/index.html --public-url ./"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.4"
+  }
+}
