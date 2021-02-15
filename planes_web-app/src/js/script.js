@@ -1,14 +1,19 @@
 import * as THREE from "three";
 import Airplane from "./Airplane";
-import { map } from "./functions";
+import { map, randomNumber } from "./functions";
 import { io } from "socket.io-client";
 
 {
   // SOCKETS
-  const socket = io("https://planes-socket-server.herokuapp.com/", {
-    // auth: {
-    //   token: "123",
-    // },
+  const authCode = randomNumber(1000, 10000);
+  console.log(authCode);
+
+  // const SOCKET_SERVER = 'https://planes-socket-server.herokuapp.com/';
+  const SOCKET_SERVER = "127.0.0.1:3000";
+  const socket = io(SOCKET_SERVER, {
+    auth: {
+      token: authCode,
+    },
   });
 
   socket.on("connect", () => {
@@ -20,9 +25,14 @@ import { io } from "socket.io-client";
   });
 
   socket.on("tap", (e) => {
+    console.log("tap");
     if (accelerometerMode) {
       handleTapScreen(e);
     }
+  });
+
+  socket.on("clientConnection", (e) => {
+    console.log("app connected", e);
   });
 
   let accHelper = new THREE.ArrowHelper();

@@ -6,3 +6,7 @@ export const round = (value, n = 2) => {
   const multiplier = n * 10;
   return Math.round(value * multiplier) / multiplier;
 };
+
+export const randomNumber = (min, max) => {
+  return Math.floor(Math.random() * (max - min) + min);
+};
