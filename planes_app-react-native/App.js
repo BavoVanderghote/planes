@@ -8,81 +8,64 @@
 
 import React, {useState, useEffect} from 'react';
 import {View, StyleSheet, Text} from 'react-native';
+import useSocket from './hooks/useSocket';
 
-import {
-  accelerometer,
-  setUpdateIntervalForType,
-  SensorTypes,
-} from 'react-native-sensors';
+// import {
+//   accelerometer,
+//   setUpdateIntervalForType,
+//   SensorTypes,
+// } from 'react-native-sensors';
 
 // import {Svg, Path, Defs, G, TextPath, Text} from 'react-native-svg';
 
 import FlightInstrument from './components/FlightInstrument';
+import NumberForm from './components/NumberForm';
 
 // import {io} from 'socket.io-client';
 import {socket} from './components/ws';
 
 const App: () => React$Node = () => {
-  const [values, setValues] = useState({x: 0, y: 0, z: 0, timestamp: 0});
-  const [orientation, setOrientation] = useState({pitch: 0, roll: 0});
-  const [controls, setControls] = useState(false);
-
-  setUpdateIntervalForType(SensorTypes.accelerometer, 100);
+  const {socketId, values, orientation, controls, clientConnection} = useSocket(
+    socket,
+  );
 
   const handleTapScreen = (e) => {
     socket.emit('tap', true);
   };
 
-  useEffect(() => {
-    // socket.io
-    socket.on('connect', () => {
-      console.log(socket.id);
-    });
-    // TODO: get pitch data
-    socket.on('orientation', (angles) => {
-      setOrientation(angles);
-    });
-
-    socket.on('controlMode', (bool) => {
-      setControls(bool);
-    });
-
-    const handleAccelerometerChange = (x, y, z, timestamp) => {
-      setValues({x: x, y: y, z: z, timestamp: timestamp});
-      socket.emit('accelerometerData', {x: x, y: y, z: z});
-    };
-
-    const subscription = accelerometer.subscribe(({x, y, z, timestamp}) =>
-      handleAccelerometerChange(x, y, z, timestamp),
+  if (clientConnection) {
+    return (
+      <View
+        style={styles.black}
+        onStartShouldSetResponder={(e) => {
+          return true;
+        }}
+        onResponderGrant={(e) => {
+          handleTapScreen(e);
+        }}>
+        <FlightInstrument values={{...values}} orientation={orientation} />
+        <Text style={styles.shoot}>
+          {controls
+            ? 'Tilt to fly and tap to shoot'
+            : 'Enable accelerometer mode to fly'}
+        </Text>
+      </View>
     );
-    return function cleanup() {
-      socket.disconnect();
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  return (
-    <View
-      style={styles.black}
-      onStartShouldSetResponder={(e) => {
-        return true;
-      }}
-      onResponderGrant={(e) => {
-        handleTapScreen(e);
-      }}>
-      <FlightInstrument values={{...values}} orientation={orientation} />
-      <Text style={styles.shoot}>
-        {controls
-          ? 'Tilt to fly and tap to shoot'
-          : 'Enable accelerometer mode to fly'}
-      </Text>
-    </View>
-  );
+  } else {
+    return (
+      <View style={styles.black}>
+        <NumberForm socketId={socketId} socket={socket}></NumberForm>
+        <Text style={styles.shoot}>You are not connected</Text>
+      </View>
+    );
+  }
 };
 
 const styles = StyleSheet.create({
   black: {
     backgroundColor: 'black',
+    width: '100%',
+    height: '100%',
   },
   shoot: {
     zIndex: 100,
