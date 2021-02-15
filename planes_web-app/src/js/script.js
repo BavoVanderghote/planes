@@ -10,8 +10,8 @@ import { io } from "socket.io-client";
   const authCode = randomNumber(1000, 10000);
   console.log(authCode);
 
-  // const SOCKET_SERVER = "https://planes-socket-server.herokuapp.com/";
-  const SOCKET_SERVER = "127.0.0.1:3000";
+  const SOCKET_SERVER = "https://planes-socket-server.herokuapp.com/";
+  // const SOCKET_SERVER = "127.0.0.1:3000";
   const socket = io(SOCKET_SERVER, {
     auth: {
       token: authCode,
