@@ -5,6 +5,8 @@ import { io } from "socket.io-client";
 
 {
   // SOCKETS
+  let connected = false;
+
   const authCode = randomNumber(1000, 10000);
   console.log(authCode);
 
@@ -26,13 +28,20 @@ import { io } from "socket.io-client";
 
   socket.on("tap", (e) => {
     console.log("tap");
-    if (accelerometerMode) {
+    if (useApp) {
       handleTapScreen(e);
     }
   });
 
   socket.on("clientConnection", (e) => {
     console.log("app connected", e);
+    connected = e;
+    toggleButtonState(document.querySelector(".app"), "inactive", !e);
+    $clickKeyboard();
+    connected
+      ? (document.querySelector(".connected").innerText = "Connected")
+      : (document.querySelector(".connected").innerText =
+          "Not connected - connect your phone with this code");
   });
 
   let accHelper = new THREE.ArrowHelper();
@@ -143,25 +152,53 @@ import { io } from "socket.io-client";
   let shoot = false;
   let reloaded = true;
   const reloadDelay = 500;
-  let accelerometerMode = false;
-  const $controls = document.querySelector(".control-button");
-  $controls.addEventListener(`click`, () => {
-    accelerometerMode = !accelerometerMode;
-    if (accelerometerMode) {
-      $controls.innerText = "Enable keyboard mode";
+  let useApp = false;
+  const $code = (document.querySelector(".code").innerText = authCode);
+  const $keyboard = document.querySelector(".keyboard");
+  const $app = document.querySelector(".app");
+  $keyboard.addEventListener(`click`, () => $clickKeyboard());
+  $app.addEventListener(`click`, () => $clickApp());
+  sendData("controlMode", false);
+
+  const $clickKeyboard = () => {
+    useApp = false;
+    document.activeElement.blur();
+    sendData("controlMode", false);
+    if (!$keyboard.classList.contains("active")) {
+      $keyboard.classList.add("active");
+    }
+    if ($app.classList.contains("active")) {
+      $app.classList.remove("active");
+    }
+    document.querySelector(".steering").innerText =
+      "Use 'wasd' to steer the airplane";
+    document.querySelector(".shooting").innerText = "Press spacebar to shoot";
+  };
+
+  const $clickApp = () => {
+    if (!$app.classList.contains("inactive")) {
+      useApp = true;
+      sendData("controlMode", true);
+      if (!$app.classList.contains("active")) {
+        $app.classList.add("active");
+      }
+      if ($keyboard.classList.contains("active")) {
+        $keyboard.classList.remove("active");
+      }
       document.querySelector(".steering").innerHTML =
         "Hold your phone upright like a flight stick </br>- pull back to fly up </br>- push back to fly down </br>- tilt sideways to steer";
       document.querySelector(".shooting").innerText = "Tap your phone to shoot";
-    } else {
-      $controls.innerText = "Enable accelerometer mode";
-      document.querySelector(".steering").innerText =
-        "Use 'wasd' to steer the airplane";
-      document.querySelector(".shooting").innerText = "Press spacebar to shoot";
     }
     document.activeElement.blur();
-    sendData("controlMode", accelerometerMode);
-  });
-  sendData("controlMode", accelerometerMode);
+  };
+
+  const toggleButtonState = ($button, className, bool) => {
+    if (bool && !$button.classList.contains(className)) {
+      $button.classList.add(className);
+    } else if (!bool && $button.classList.contains(className)) {
+      $button.classList.remove(className);
+    }
+  };
 
   // the ground
   const groundGeometry = new THREE.BoxGeometry(120, 1, 120, 1, 1, 1);
@@ -301,7 +338,7 @@ import { io } from "socket.io-client";
 
   const movePlayer = (mode) => {
     if (!dead && !win) {
-      switch (accelerometerMode) {
+      switch (useApp) {
         case true: // accelerometer
           if (accX > deadzone) {
             const angle = map(accX, deadzone, 10, Math.PI / 30, Math.PI / 6);

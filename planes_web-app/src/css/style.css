@@ -60,6 +60,10 @@ body {
   line-height: 1.2;
 }
 
+.code {
+  font-size: 4rem;
+}
+
 .restart {
   font-size: 1.6vw;
   grid-row: 4;
@@ -75,10 +79,14 @@ body {
   font-size: 1.4rem;
 }
 
+.control-button__wrapper {
+  margin-top: 1rem;
+}
+
 .control-button {
   border: none;
   padding: 1rem;
-  background-color: #ba3f1d;
+  background-color: #777777;
   color: white;
   font-weight: 700;
   border-radius: 0.5rem;
@@ -88,6 +96,22 @@ body {
 
 .control-button:hover {
   background-color: #de522b;
+  transition: all 0.1s;
+}
+
+.active {
+  background-color: #ba3f1d;
+  transition: all 0.1s;
+}
+
+.inactive {
+  background-color: #b1b1b1;
+  color: #dadada;
+  transition: all 0.1s;
+}
+
+.inactive:hover {
+  background-color: #b1b1b1;
   transition: all 0.1s;
 }
 
