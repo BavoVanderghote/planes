@@ -47,7 +47,7 @@ const App: () => React$Node = () => {
         <Text style={styles.shoot}>
           {controls
             ? 'Tilt to fly and tap to shoot'
-            : 'Enable accelerometer mode to fly'}
+            : 'Enable app mode in the game'}
         </Text>
       </View>
     );
