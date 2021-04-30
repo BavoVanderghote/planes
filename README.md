@@ -43,3 +43,7 @@ This app is built with:
 - [Three.js](https://threejs.org/)
 - [Socket.io](https://socket.io/)
 - [React Native](https://reactnative.dev/)
+
+# Socket server repo
+
+https://github.com/BavoVanderghote/planes_socket_server
